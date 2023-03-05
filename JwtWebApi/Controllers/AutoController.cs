@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.JSInterop;
 using System.Dynamic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -20,12 +22,15 @@ namespace JwtWebApi.Controllers
         private readonly DataContext _context;
         private readonly IConfiguration _configuration;
         public string currentUserName = "";
+        private readonly IHeroesRepository _heroesRepository;
+        private readonly IJSRuntime _jsRuntime;
 
 
-   
 
-        public AutoController(IConfiguration configuration, DataContext context, IHeroesRepository heroesRepository)
+
+        public AutoController(IConfiguration configuration, DataContext context, IHeroesRepository heroesRepository, IJSRuntime jsRuntime)
         {
+            _jsRuntime = jsRuntime;
             _configuration = configuration;
             _context = context;
             _heroesRepository = heroesRepository;
@@ -66,6 +71,20 @@ namespace JwtWebApi.Controllers
             currentUserName = user.Username;
             Console.WriteLine(currentUserName);
             string token = CreateToken(user);
+            ////added
+
+            // Save data in a session
+            //var data = new { Name = "John Doe", Age = 42 };
+            //var serializer = new JavaScriptSerializer();
+            //var json = serializer.Serialize(data);
+            //System.Web.HttpContext.Current.Session["mydata"] = json;
+
+            //// Retrieve data from a session
+            //var json2 = System.Web.HttpContext.Current.Session["mydata"] as string;
+            //var data2 = serializer.Deserialize(json2, typeof(object)) as dynamic;
+
+
+
             dynamic flexible = new ExpandoObject();
             var dictionary = (IDictionary<string, Object>)flexible;
             dictionary.Add("access_token", token);
@@ -98,16 +117,15 @@ namespace JwtWebApi.Controllers
 
       
 
-            private readonly IHeroesRepository _heroesRepository;
 
 
 
             [HttpGet("")]
-            public async Task<IActionResult> getAllHeroes()
-            {
-                var res = await _heroesRepository.GetAllHeroesAsync();
+            public async Task<IActionResult> getAllHeroes(){
 
-                if (res?.Count > 0)
+            var res = await _heroesRepository.GetAllHeroesAsync();
+
+            if (res?.Count > 0)
                 {
                     return Ok(res);
                 }
@@ -142,17 +160,14 @@ namespace JwtWebApi.Controllers
             }
 
 
-            [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-            [HttpGet("/me")]
-            public ActionResult<string> GetCurrentUser()
-            {
-                return User?.FindFirst(ClaimTypes.Name)?.Value;
-
-              
-            }
+        [HttpGet("/me")]
+        public ActionResult<string> GetCurrentUser()
+        {
+            return Ok(User?.FindFirst(ClaimTypes.Name)?.Value);
+        }
 
 
 
-        
+
     }
 }

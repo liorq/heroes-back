@@ -14,6 +14,6 @@ namespace JwtWebApi.Repositories
         Task<List<Hero>> TrainHeroByIdAsync(string name, string userName);
         Task<List<Hero>> GetHeroByIdAsync(int id, string userName);
         Task<bool> TrainHeroAsync(string name, string userName);
-
+        Task<List<Hero>> SetAllHeroesAsync();
     }
 }

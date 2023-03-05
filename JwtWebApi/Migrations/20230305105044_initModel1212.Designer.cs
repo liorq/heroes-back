@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JwtWebApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230305095141_initModel")]
-    partial class initModel
+    [Migration("20230305105044_initModel1212")]
+    partial class initModel1212
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
