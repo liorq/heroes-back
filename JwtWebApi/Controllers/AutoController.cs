@@ -100,10 +100,7 @@ namespace JwtWebApi.Controllers
 
             private readonly IHeroesRepository _heroesRepository;
 
-            public HeroesController(IHeroesRepository heroesRepository)
-            {
-                _heroesRepository = heroesRepository;
-            }
+
 
             [HttpGet("")]
             public async Task<IActionResult> getAllHeroes()

@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using JwtWebApi.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -48,6 +49,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
             ValidateAudience = false
         };
     });
+builder.Services.AddScoped<IHeroesRepository, HeroesRepository>();
 
 builder.Services.AddDbContext<DataContext>(options =>
 {
