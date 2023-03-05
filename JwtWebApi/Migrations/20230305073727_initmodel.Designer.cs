@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JwtWebApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221031090238_init-db")]
-    partial class initdb
+    [Migration("20230305073727_initmodel")]
+    partial class initmodel
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -161,7 +161,7 @@ namespace JwtWebApi.Migrations
                     b.ToTable("Rooms");
                 });
 
-            modelBuilder.Entity("JwtWebApi.User", b =>
+            modelBuilder.Entity("JwtWebApi.tables.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

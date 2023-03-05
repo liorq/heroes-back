@@ -159,7 +159,7 @@ namespace JwtWebApi.Migrations
                     b.ToTable("Rooms");
                 });
 
-            modelBuilder.Entity("JwtWebApi.User", b =>
+            modelBuilder.Entity("JwtWebApi.tables.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

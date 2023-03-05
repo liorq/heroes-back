@@ -17,10 +17,27 @@ namespace JwtWebApi.Controllers
         private readonly DataContext _context;
         private readonly IConfiguration _configuration;
 
+
+
+
         public AutoController(IConfiguration configuration, DataContext context)
         {
             _configuration = configuration;
             _context = context;
+        }
+
+        [HttpPost("/signUp")]
+        public async Task<User> CreateUser(string username, string password, string role)
+        {
+            var user = new User
+            {
+                Username = username,
+                Password = password,
+                Role = role
+            };
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+            return user;
         }
         public record class ReqData(string username, string password);
 

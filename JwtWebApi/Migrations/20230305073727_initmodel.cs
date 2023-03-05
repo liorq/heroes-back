@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace JwtWebApi.Migrations
 {
-    public partial class initdb : Migration
+    public partial class initmodel : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
