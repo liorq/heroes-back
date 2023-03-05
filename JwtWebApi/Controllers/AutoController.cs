@@ -1,6 +1,8 @@
 ﻿using JwtWebApi.data;
 using JwtWebApi.Repositories;
 using JwtWebApi.tables;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -117,7 +119,9 @@ namespace JwtWebApi.Controllers
             [HttpGet("{heroId}")]
             public async Task<IActionResult> GetHeroById(int heroId)
             {
-                var res = await _heroesRepository.GetHeroByIdAsync(heroId);
+               
+
+                var res = await _heroesRepository.GetHeroByIdAsync(heroId, GetCurrentUser().Value);
                 if (res != null)
                 {
                     return Ok(res);
@@ -129,14 +133,24 @@ namespace JwtWebApi.Controllers
 
             public async Task<IActionResult> TrainHero(string heroName)
             {
-                var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName);
-                if (isValidTrain)
+
+                var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName, GetCurrentUser().Value);
+                    if (isValidTrain)
                     return Ok();
 
 
                 return NotFound();
             }
 
+
+            [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+            [HttpGet("/me")]
+            public async ActionResult<string> GetCurrentUser()
+            {
+                return await User.FindFirst(ClaimTypes.Name)?.Value;
+
+              
+            }
 
 
 

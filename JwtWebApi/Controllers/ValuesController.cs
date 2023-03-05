@@ -41,9 +41,9 @@ namespace JwtWebApi.Controllers
         }
         [HttpPatch("{heroId}")]
 
-        public async Task<IActionResult> TrainHero(int heroId)
+        public async Task<IActionResult> TrainHero(string heroName)
         {
-            var isValidTrain = await _heroesRepository.TrainHeroAsync(heroId);
+            var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName);
             if (isValidTrain)
                 return Ok();
 
