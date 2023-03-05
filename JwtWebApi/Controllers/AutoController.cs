@@ -1,4 +1,5 @@
 ﻿using JwtWebApi.data;
+using JwtWebApi.Repositories;
 using JwtWebApi.tables;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,7 @@ namespace JwtWebApi.Controllers
         public static User user = new User();
         private readonly DataContext _context;
         private readonly IConfiguration _configuration;
-
+        public string currentUserName = "";
 
 
 
@@ -57,12 +58,15 @@ namespace JwtWebApi.Controllers
             {
                 return BadRequest("Wrong Password");
             }
+            currentUserName = user.Username;
+            Console.WriteLine(currentUserName);
             string token = CreateToken(user);
             dynamic flexible = new ExpandoObject();
             var dictionary = (IDictionary<string, Object>)flexible;
             dictionary.Add("access_token", token);
             dictionary.Add("token_expiry", DateTime.Now.AddDays(2));
             dictionary.Add("needTofixDate", false);
+          
             return Ok(dictionary);
         }
         private string CreateToken(User user)
@@ -85,6 +89,57 @@ namespace JwtWebApi.Controllers
                 );
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
             return jwt;
+        }
+
+        public class HeroesController : ControllerBase
+        {
+
+            private readonly IHeroesRepository _heroesRepository;
+
+            public HeroesController(IHeroesRepository heroesRepository)
+            {
+                _heroesRepository = heroesRepository;
+            }
+
+            [HttpGet("")]
+            public async Task<IActionResult> getAllHeroes()
+            {
+                var res = await _heroesRepository.GetAllHeroesAsync();
+
+                if (res?.Count > 0)
+                {
+                    return Ok(res);
+                }
+                return BadRequest("zeev is mniake");
+
+            }
+
+            [HttpGet("{heroId}")]
+            public async Task<IActionResult> GetHeroById(int heroId)
+            {
+                var res = await _heroesRepository.GetHeroByIdAsync(heroId);
+                if (res != null)
+                {
+                    return Ok(res);
+                }
+                return NotFound();
+
+            }
+            [HttpPatch("{heroId}")]
+
+            public async Task<IActionResult> TrainHero(string heroName)
+            {
+                var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName);
+                if (isValidTrain)
+                    return Ok();
+
+
+                return NotFound();
+            }
+
+
+
+
         }
     }
 }

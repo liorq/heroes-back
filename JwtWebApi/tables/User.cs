@@ -10,6 +10,6 @@
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
 
-        public List<Hero> Heroes { get; set; }
+        public List<Hero>? Heroes { get; set; }
     }
 }

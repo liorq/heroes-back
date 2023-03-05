@@ -1,4 +1,5 @@
 ﻿using JwtWebApi.tables;
+using Microsoft.AspNetCore.Mvc;
 
 namespace JwtWebApi.Repositories
 {
@@ -9,5 +10,6 @@ namespace JwtWebApi.Repositories
         Task<List<Hero>> GetHeroByIdAsync(int id);
         Task<List<Hero>> TrainHeroByIdAsync(string name);
         Task<bool> TrainHeroAsync(string name);
+     
     }
 }

@@ -27,7 +27,7 @@ namespace JwtWebApi.Repositories
 
             ///intiti framework
             ///כל מה שמתשנה בקונטקסט משתנה גם בפיירמוורק
-            var heroes = await _context.Heroes.ToListAsync();
+            var heroes = await _context.Heroes.ToList();
             await TrainHeroByIdAsync("liot");
             foreach (var hero in heroes)
             {
@@ -38,14 +38,14 @@ namespace JwtWebApi.Repositories
 
         public async Task<List<Hero>> GetHeroByIdAsync(int id)
         {
-            var hero = await _context.Heroes.Where(b => b.Id == id).ToListAsync();
+            var hero = await _context.Users.Heroes.Where(b => b.Id == id).ToListAsync();
             return hero;
         }
 
 
         public async Task<List<Hero>> TrainHeroByIdAsync(string name)
         {
-            var hero = await _context.Heroes.Where(b => b.Name == name).ToListAsync();
+            var hero = await _context.Users.Heroes.Where(b => b.Name == name).ToListAsync();
             Random random = new Random();
             foreach (var Hero in hero)
             {
@@ -59,7 +59,7 @@ namespace JwtWebApi.Repositories
         public async Task<bool> TrainHeroAsync(string name)
         {
 
-            var hero = await _context.Heroes.Where(b => b.Name == name).ToListAsync();
+            var hero = await _context.Users.Heroes.Where(b => b.Name == name).ToListAsync();
             Random random = new Random();
             foreach (var Hero in hero)
             {
