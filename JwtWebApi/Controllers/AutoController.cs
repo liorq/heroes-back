@@ -129,14 +129,14 @@ namespace JwtWebApi.Controllers
         /// </summary>
         /// <param</param>
         /// <returns></returns>
-        [HttpGet("{heroId}")]
+          [HttpGet("{heroId}")]
             public async Task<IActionResult> GetHeroById(int heroId)
             {
             var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             var handler = new JwtSecurityTokenHandler();
             var decodedToken = handler.ReadJwtToken(token);
             var userId = decodedToken.Claims.ToArray()[0]?.Value;
-
+      
             
             var res = await _heroesRepository.GetHeroByIdAsync(heroId, userId);
                 if (res != null)
@@ -146,12 +146,16 @@ namespace JwtWebApi.Controllers
                 return NotFound();
 
             }
-            [HttpPatch("{heroId}")]
+            [HttpPatch("{heroName}")]
 
             public async Task<IActionResult> TrainHero(string heroName)
             {
-
-            var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName, GetCurrentUser().Value);
+            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+            var userId = decodedToken.Claims.ToArray()[0]?.Value;
+       
+            var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName, userId);
                     if (isValidTrain)
                     return Ok();
 
@@ -161,11 +165,27 @@ namespace JwtWebApi.Controllers
 
 
         [HttpGet("/me")]
-        public ActionResult<string> GetCurrentUser()
+        public async Task<IActionResult> GetCurrentUser()
         {
             return Ok(User?.FindFirst(ClaimTypes.Name)?.Value);
         }
 
+        [HttpPost("/nameOfHero")]
+        public async Task<IActionResult> isPossibleAddNewHero(string nameOfHero)
+        {
+            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+            var userId = decodedToken.Claims.ToArray()[0]?.Value;
+
+
+           var isHeroAdded = await _heroesRepository.AddHeroAsync(nameOfHero, userId);
+            if (isHeroAdded)
+                return Ok("hero added");
+            else
+                return BadRequest("hero already exicted");
+
+        }
 
 
 

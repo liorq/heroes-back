@@ -2,6 +2,7 @@
 using JwtWebApi.tables;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace JwtWebApi.Repositories
 {
@@ -24,13 +25,13 @@ namespace JwtWebApi.Repositories
         new Hero { Name = "Iron Man", Ability = "Powered suit with weapons and flight capabilities", Id = null, FirstDayHeroTrained = 1963, StartingPower = 85, CurrentPower = 80, SuitColors = "Red, gold", LastTimeHeroTrained = "Yesterday" }
     };
 
-                foreach (var hero in heroes)
-                {
-                    _context.Heroes.Add(hero);
+            foreach (var hero in heroes)
+            {
+                _context.Heroes.Add(hero);
                 Console.WriteLine(hero.Name);
-                }
-                await _context.SaveChangesAsync(); // persist changes to the database
-       
+            }
+            await _context.SaveChangesAsync(); // persist changes to the database
+
             return heroes;
         }
 
@@ -39,8 +40,8 @@ namespace JwtWebApi.Repositories
             ///intiti framework
             ///כל מה שמתשנה בקונטקסט משתנה גם בפיירמוורק
             var heroes = await _context.Heroes.ToListAsync();
-            if(heroes.Count == 0)
-            await SetAllHeroesAsync();
+            if (heroes.Count == 0)
+                await SetAllHeroesAsync();
 
             foreach (var hero in heroes)
             {
@@ -57,7 +58,7 @@ namespace JwtWebApi.Repositories
                 throw new ArgumentException("User not found.");
             }
 
-            var hero =  user?.Heroes?.ToList();
+            var hero = user?.Heroes?.ToList();
             if (hero == null)
             {
                 throw new ArgumentException("Hero not found.");
@@ -93,6 +94,8 @@ namespace JwtWebApi.Repositories
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
 
             var heroes = user?.Heroes?.Where(b => b.Name == name);
+            if (heroes == null)
+                return false;
 
             Random random = new Random();
             foreach (var hero in heroes)
@@ -102,27 +105,32 @@ namespace JwtWebApi.Repositories
                 Console.WriteLine(hero.CurrentPower);
             }
             await _context.SaveChangesAsync();
-                ///להוסיף שקר אם זה לא הצליח
+            ///להוסיף שקר אם זה לא הצליח
             return true;
 
 
         }
 
-        //public async Task<bool> AddHeroAsync(string nameOfHero, string userName)
-        //{
-        //var user = await _context.Users.Where(b => b.UserName == userName).ToListAsync();
-        //var heroes = await user.Where(b => b.heroes).ToListAsync();
+        public async Task<bool> AddHeroAsync(string nameOfHero, string userName)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
+            var heroes = user?.Heroes?.Where(b => b.Name == userName);
+            var newHeroes = await _context.Heroes.FirstOrDefaultAsync(b => b.Name == userName);
 
 
-        //    foreach (var hero in heroes)
-        //    {
-        //        if (hero.Name == nameOfHero)
-        //        {
-        //            return false;
-        //        }
+            foreach (var hero in heroes)
+            {
+                if (hero.Name == nameOfHero)
+                {
+                    return false;
+                }
 
 
-        //    }
-        //    return true;
+            }
+            if (newHeroes == null)
+                return false;
+            user?.Heroes?.Add(newHeroes);
+            return true;
+        }
     }
 }
