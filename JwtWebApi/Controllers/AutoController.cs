@@ -132,15 +132,13 @@ namespace JwtWebApi.Controllers
         [HttpGet("{heroId}")]
             public async Task<IActionResult> GetHeroById(int heroId)
             {
-            Console.WriteLine("start of GetHeroById");
-
             var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             var handler = new JwtSecurityTokenHandler();
             var decodedToken = handler.ReadJwtToken(token);
             var userId = decodedToken.Claims.ToArray()[0]?.Value;
 
-            Console.WriteLine(userId);
-            var res = await _heroesRepository.GetHeroByIdAsync(heroId, GetCurrentUser().Value);
+            
+            var res = await _heroesRepository.GetHeroByIdAsync(heroId, userId);
                 if (res != null)
                 {
                     return Ok(res);
@@ -153,7 +151,7 @@ namespace JwtWebApi.Controllers
             public async Task<IActionResult> TrainHero(string heroName)
             {
 
-                var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName, GetCurrentUser().Value);
+            var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName, GetCurrentUser().Value);
                     if (isValidTrain)
                     return Ok();
 
