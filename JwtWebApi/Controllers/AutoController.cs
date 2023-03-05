@@ -121,7 +121,7 @@ namespace JwtWebApi.Controllers
             {
                
 
-                var res = await _heroesRepository.GetHeroByIdAsync(heroId, GetCurrentUser().Value);
+                var res = await _heroesRepository.GetHeroByIdAsync(heroId, GetCurrentUser()?.Value);
                 if (res != null)
                 {
                     return Ok(res);
@@ -134,7 +134,7 @@ namespace JwtWebApi.Controllers
             public async Task<IActionResult> TrainHero(string heroName)
             {
 
-                var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName, GetCurrentUser().Value);
+                var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName, GetCurrentUser()?.Value);
                     if (isValidTrain)
                     return Ok();
 
@@ -145,9 +145,9 @@ namespace JwtWebApi.Controllers
 
             [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
             [HttpGet("/me")]
-            public async ActionResult<string> GetCurrentUser()
+            public ActionResult<string> GetCurrentUser()
             {
-                return await User.FindFirst(ClaimTypes.Name)?.Value;
+                return User?.FindFirst(ClaimTypes.Name)?.Value;
 
               
             }

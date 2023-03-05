@@ -49,7 +49,7 @@ namespace JwtWebApi.Repositories
                 throw new ArgumentException("User not found.");
             }
 
-            var hero =  user.Heroes.ToList();
+            var hero =  user?.Heroes?.ToList();
             if (hero == null)
             {
                 throw new ArgumentException("Hero not found.");
@@ -62,7 +62,7 @@ namespace JwtWebApi.Repositories
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
 
-            var hero = user.Heroes.Where(b => b.Name == name);
+            var hero = user?.Heroes?.Where(b => b.Name == name);
             Random random = new Random();
             foreach (var Hero in hero)
             {
@@ -75,18 +75,24 @@ namespace JwtWebApi.Repositories
         }
         public async Task<bool> TrainHeroAsync(string name, string userName)
         {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
 
-            var hero = await _context.Users.Heroes.Where(b => b.Name == name).ToListAsync();
+            var heroes = user?.Heroes?.Where(b => b.Name == name);
+
             Random random = new Random();
-            foreach (var Hero in hero)
+            foreach (var hero in heroes)
             {
                 double v = (1 + random.NextDouble() * 0.1);
-                Hero.CurrentPower = Hero.CurrentPower * v;
-                Console.WriteLine(Hero.CurrentPower);
-                return true;
+                hero.CurrentPower = hero.CurrentPower * v;
+                Console.WriteLine(hero.CurrentPower);
             }
-            return false;
+            await _context.SaveChangesAsync();
+                ///להוסיף שקר אם זה לא הצליח
+            return true;
+
+
         }
+
         //public async Task<bool> AddHeroAsync(string nameOfHero, string userName)
         //{
         //var user = await _context.Users.Where(b => b.UserName == userName).ToListAsync();
