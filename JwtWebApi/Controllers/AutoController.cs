@@ -22,11 +22,14 @@ namespace JwtWebApi.Controllers
         public string currentUserName = "";
 
 
+   
 
-        public AutoController(IConfiguration configuration, DataContext context)
+        public AutoController(IConfiguration configuration, DataContext context, IHeroesRepository heroesRepository)
         {
             _configuration = configuration;
             _context = context;
+            _heroesRepository = heroesRepository;
+
         }
 
         [HttpPost("/signUp")]
@@ -93,8 +96,7 @@ namespace JwtWebApi.Controllers
             return jwt;
         }
 
-        public class HeroesController : ControllerBase
-        {
+      
 
             private readonly IHeroesRepository _heroesRepository;
 
@@ -121,7 +123,7 @@ namespace JwtWebApi.Controllers
             {
                
 
-                var res = await _heroesRepository.GetHeroByIdAsync(heroId, GetCurrentUser()?.Value);
+                var res = await _heroesRepository.GetHeroByIdAsync(heroId, GetCurrentUser().Value);
                 if (res != null)
                 {
                     return Ok(res);
@@ -134,7 +136,7 @@ namespace JwtWebApi.Controllers
             public async Task<IActionResult> TrainHero(string heroName)
             {
 
-                var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName, GetCurrentUser()?.Value);
+                var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName, GetCurrentUser().Value);
                     if (isValidTrain)
                     return Ok();
 
@@ -154,6 +156,6 @@ namespace JwtWebApi.Controllers
 
 
 
-        }
+        
     }
 }
