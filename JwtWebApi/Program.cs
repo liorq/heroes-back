@@ -52,6 +52,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
     });
 
 builder.Services.AddScoped<IHeroesRepository, HeroesRepository>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 
 builder.Services.AddDbContext<DataContext>(options =>

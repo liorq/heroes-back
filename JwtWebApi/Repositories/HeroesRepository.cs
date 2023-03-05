@@ -70,8 +70,8 @@ namespace JwtWebApi.Repositories
         /// ברגע שאני עובר אוטנטיקציה אז הוא ידע מהטוקן את האיידי שלך 
         /// ואז לפי האיידי 
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="userName"></param>
+        /// <param /*name="name">*/</param>
+        //*// <param name="userName"></param>*/
         /// <returns></returns>
         public async Task<List<Hero>> TrainHeroByIdAsync(string name, string userName)
         {

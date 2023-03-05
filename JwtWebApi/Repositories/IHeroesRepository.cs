@@ -5,11 +5,7 @@ namespace JwtWebApi.Repositories
 {
     public interface IHeroesRepository
     {
-        //Task<List<Hero>> SetAllHeroesAsync();
-        //Task<List<Hero>> GetAllHeroesAsync();
-        //Task<List<Hero>> GetHeroByIdAsync(int id);
-        //Task<List<Hero>> TrainHeroByIdAsync(string name, string userName);
-        //Task<bool> TrainHeroAsync(string name,string userName);
+      
         Task<List<Hero>> GetAllHeroesAsync();
         Task<List<Hero>> TrainHeroByIdAsync(string name, string userName);
         Task<List<Hero>> GetHeroByIdAsync(int id, string userName);

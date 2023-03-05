@@ -12,10 +12,12 @@ using System.Dynamic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Xml;
+using Microsoft.AspNetCore.Http;
 
 namespace JwtWebApi.Controllers
 {
     [ApiController]
+    
     public class AutoController : ControllerBase
     {
         public static User user = new User();
@@ -23,14 +25,14 @@ namespace JwtWebApi.Controllers
         private readonly IConfiguration _configuration;
         public string currentUserName = "";
         private readonly IHeroesRepository _heroesRepository;
-        private readonly IJSRuntime _jsRuntime;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
 
 
 
-        public AutoController(IConfiguration configuration, DataContext context, IHeroesRepository heroesRepository, IJSRuntime jsRuntime)
+        public AutoController(IHttpContextAccessor httpContextAccessor,IConfiguration configuration, DataContext context, IHeroesRepository heroesRepository)
         {
-            _jsRuntime = jsRuntime;
+            _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
             _context = context;
             _heroesRepository = heroesRepository;
@@ -71,18 +73,7 @@ namespace JwtWebApi.Controllers
             currentUserName = user.Username;
             Console.WriteLine(currentUserName);
             string token = CreateToken(user);
-            ////added
-
-            // Save data in a session
-            //var data = new { Name = "John Doe", Age = 42 };
-            //var serializer = new JavaScriptSerializer();
-            //var json = serializer.Serialize(data);
-            //System.Web.HttpContext.Current.Session["mydata"] = json;
-
-            //// Retrieve data from a session
-            //var json2 = System.Web.HttpContext.Current.Session["mydata"] as string;
-            //var data2 = serializer.Deserialize(json2, typeof(object)) as dynamic;
-
+          
 
 
             dynamic flexible = new ExpandoObject();
@@ -132,13 +123,24 @@ namespace JwtWebApi.Controllers
                 return BadRequest("zeev is mniake");
 
             }
-
-            [HttpGet("{heroId}")]
+        /// <summary>
+        /// //from headers bearer and token without auto postmen only key= Authorization
+        /// /// value exaple= Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6ImEiLCJleHAiOjE2NzgxOTY0MjN9.gNDgXckCC1u510ZVmR53YAKgRn5LeISD1BjxJDMoZ2dSpz3a2LKaXnbNJPWtK2nnyGYMAZKak1CspzMorjtYTg
+        /// </summary>
+        /// <param</param>
+        /// <returns></returns>
+        [HttpGet("{heroId}")]
             public async Task<IActionResult> GetHeroById(int heroId)
             {
-               
+            Console.WriteLine("start of GetHeroById");
 
-                var res = await _heroesRepository.GetHeroByIdAsync(heroId, GetCurrentUser().Value);
+            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+            var userId = decodedToken.Claims.ToArray()[0]?.Value;
+
+            Console.WriteLine(userId);
+            var res = await _heroesRepository.GetHeroByIdAsync(heroId, GetCurrentUser().Value);
                 if (res != null)
                 {
                     return Ok(res);

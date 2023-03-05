@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "51s/o+x1b0fZhEm99bKl/jbUPkxutZHmkPH9ZtjgcrUb0fpEllMMZ99K2ohS20tfxf723JSUInBBRgDWPQFHPw==",
+  "dgSpecHash": "1o8QBu8pxuq27BoPK6tRN36LyYRo55pAP7WR8TixAw7gwyG4j8Hoj2wiz5Hmq7AolIdoVyB9joRn+ip+ohh/Qw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\moshe\\Source\\Repos\\.net-backendsvvssvsv\\JwtWebApi\\JwtWebApi.csproj",
+  "projectFilePath": "C:\\Users\\moshe\\Source\\Repos\\heroes-backendSCCS\\JwtWebApi\\JwtWebApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\moshe\\.nuget\\packages\\antlr3.runtime\\3.5.1\\antlr3.runtime.3.5.1.nupkg.sha512",
     "C:\\Users\\moshe\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
