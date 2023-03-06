@@ -48,7 +48,6 @@ namespace JwtWebApi.Controllers
                 Role = role,
                 Heroes = new List<Hero>(),
 
-                ////להוסיף מזהה 
             };
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -122,7 +121,7 @@ namespace JwtWebApi.Controllers
 
 
 
-        [HttpGet("users/user/heroes")]
+        [HttpGet("users/{user}/heroes")]
          public async Task<IActionResult> getAllUserHeroes()
            {
             var userId = getUserNameByToken();
@@ -141,7 +140,7 @@ namespace JwtWebApi.Controllers
 
      
 
-        [HttpPatch("users/user/heroes/{heroName}")]
+        [HttpPatch("users/{user}/heroes/{heroName}")]
             ///istrainHeroPossible
             public async Task<IActionResult> TrainHero(string heroName)
             {
@@ -154,7 +153,7 @@ namespace JwtWebApi.Controllers
                 return BadRequest("hero not trained");
             }
 
-        [HttpPost("users/user/heroes/{nameOfHero}")]
+        [HttpPost("users/{user}/heroes/{nameOfHero}")]
         public async Task<IActionResult> isPossibleAddNewHero(string nameOfHero)
         {
            var userId = getUserNameByToken();

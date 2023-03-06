@@ -97,7 +97,6 @@ namespace JwtWebApi.Repositories
             ///להוסיף שדה של היום ראשון שהתאמנתי ושדה של הפעם האחרונה שהתאמנתי וכמות הפעמים שהתאמנתי באותו יום 
             
             await _context.SaveChangesAsync();
-            ///להוסיף שקר אם זה לא הצליח
             return true;
 
         }
