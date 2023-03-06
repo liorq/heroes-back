@@ -73,6 +73,11 @@ namespace JwtWebApi.Repositories
             }
             return Heroes;
         }
+        public async Task<List<Hero>> GetAllUserHeroes(string userName)
+        {
+            var heroes = _context.AllHeroes.Where(u => u.TrainerName == userName);
+            return heroes.OrderByDescending(h => h.CurrentPower).ToList();
+        }
 
         /// <summary>
         /// route my heroes 
