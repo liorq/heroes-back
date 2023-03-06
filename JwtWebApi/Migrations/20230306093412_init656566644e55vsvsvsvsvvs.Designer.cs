@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JwtWebApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230305130527_initvdvd")]
-    partial class initvdvd
+    [Migration("20230306093412_init656566644e55vsvsvsvsvvs")]
+    partial class init656566644e55vsvsvsvsvvs
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -73,6 +73,9 @@ namespace JwtWebApi.Migrations
                     b.Property<string>("SuitColors")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("TrainerName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
@@ -80,7 +83,7 @@ namespace JwtWebApi.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Heroes");
+                    b.ToTable("Hero");
                 });
 
             modelBuilder.Entity("JwtWebApi.tables.Messages", b =>

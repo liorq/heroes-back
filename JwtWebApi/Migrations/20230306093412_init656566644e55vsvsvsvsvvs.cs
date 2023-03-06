@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace JwtWebApi.Migrations
 {
-    public partial class initModel1212 : Migration
+    public partial class init656566644e55vsvsvsvsvvs : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -100,13 +100,14 @@ namespace JwtWebApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Heroes",
+                name: "Hero",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Ability = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TrainerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FirstDayHeroTrained = table.Column<int>(type: "int", nullable: true),
                     StartingPower = table.Column<double>(type: "float", nullable: true),
                     CurrentPower = table.Column<double>(type: "float", nullable: true),
@@ -116,17 +117,17 @@ namespace JwtWebApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Heroes", x => x.Id);
+                    table.PrimaryKey("PK_Hero", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Heroes_Users_UserId",
+                        name: "FK_Hero_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Heroes_UserId",
-                table: "Heroes",
+                name: "IX_Hero_UserId",
+                table: "Hero",
                 column: "UserId");
         }
 
@@ -136,7 +137,7 @@ namespace JwtWebApi.Migrations
                 name: "Guests");
 
             migrationBuilder.DropTable(
-                name: "Heroes");
+                name: "Hero");
 
             migrationBuilder.DropTable(
                 name: "Messages");

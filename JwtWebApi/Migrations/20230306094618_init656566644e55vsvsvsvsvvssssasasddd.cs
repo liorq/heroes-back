@@ -4,7 +4,7 @@
 
 namespace JwtWebApi.Migrations
 {
-    public partial class initvdvd : Migration
+    public partial class init656566644e55vsvsvsvsvvssssasasddd : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

@@ -1,6 +1,7 @@
 ﻿using JwtWebApi.data;
 using JwtWebApi.tables;
 using Microsoft.EntityFrameworkCore;
+using NHibernate.Util;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -18,11 +19,11 @@ namespace JwtWebApi.Repositories
         public async Task<List<Hero>> SetAllHeroesAsync()
         {
             List<Hero> heroes = new List<Hero> {
-        new Hero { Name = "Superman", Ability = "Super strength, flight, invulnerability", Id = null, FirstDayHeroTrained = 1978, StartingPower = 100, CurrentPower = 95, SuitColors = "Red, blue, yellow", LastTimeHeroTrained = "Yesterday" },
-        new Hero { Name = "Batman", Ability = "Peak physical and mental conditioning, martial arts, detective skills", Id = null, FirstDayHeroTrained = 1939, StartingPower = 80, CurrentPower = 70, SuitColors = "Black, gray", LastTimeHeroTrained = "Last week" },
-        new Hero { Name = "Wonder Woman", Ability = "Super strength, flight, invulnerability, Lasso of Truth", Id = null, FirstDayHeroTrained = 1941, StartingPower = 90, CurrentPower = 85, SuitColors = "Red, blue, gold", LastTimeHeroTrained = "Yesterday" },
-        new Hero { Name = "Spider-Man", Ability = "Super strength, agility, spider-sense, web-slinging", Id = null, FirstDayHeroTrained = 1962, StartingPower = 70, CurrentPower = 60, SuitColors = "Red, blue", LastTimeHeroTrained = "Last week" },
-        new Hero { Name = "Iron Man", Ability = "Powered suit with weapons and flight capabilities", Id = null, FirstDayHeroTrained = 1963, StartingPower = 85, CurrentPower = 80, SuitColors = "Red, gold", LastTimeHeroTrained = "Yesterday" }
+        new Hero { Name = "Superman", Ability = "Super strength, flight, invulnerability", Id = null, FirstDayHeroTrained = 1978, StartingPower = 100, CurrentPower = 95, SuitColors = "Red, blue, yellow", LastTimeHeroTrained = "Yesterday" ,TrainerName="manger"},
+        new Hero { Name = "Batman", Ability = "Peak physical and mental conditioning, martial arts, detective skills", Id = null, FirstDayHeroTrained = 1939, StartingPower = 80, CurrentPower = 70, SuitColors = "Black, gray", LastTimeHeroTrained = "Last week",TrainerName="manger" },
+        new Hero { Name = "Wonder Woman", Ability = "Super strength, flight, invulnerability, Lasso of Truth", Id = null, FirstDayHeroTrained = 1941, StartingPower = 90, CurrentPower = 85, SuitColors = "Red, blue, gold", LastTimeHeroTrained = "Yesterday",TrainerName="manger" },
+        new Hero { Name = "Spider-Man", Ability = "Super strength, agility, spider-sense, web-slinging", Id = null, FirstDayHeroTrained = 1962, StartingPower = 70, CurrentPower = 60, SuitColors = "Red, blue", LastTimeHeroTrained = "Last week" ,TrainerName="manger"},
+        new Hero { Name = "Iron Man", Ability = "Powered suit with weapons and flight capabilities", Id = null, FirstDayHeroTrained = 1963, StartingPower = 85, CurrentPower = 80, SuitColors = "Red, gold", LastTimeHeroTrained = "Yesterday" ,TrainerName="manger"}
     };
 
             foreach (var hero in heroes)
@@ -121,9 +122,10 @@ namespace JwtWebApi.Repositories
         public async Task<bool> AddHeroAsync(string nameOfHero, string userName)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
-            var heroes = await _context.UsersHeroes.FirstOrDefaultAsync(b => b.TrainerName == userName);
+            var heroes = await _context.AllHeroes.FirstOrDefaultAsync(b => b.TrainerName == userName);
 
-            var newHero = await _context.AllHeroes.FirstOrDefaultAsync(b => b.Name == nameOfHero);
+            var allHeroes = _context.AllHeroes.Where(h=>h.TrainerName=="manger");
+            var newHero = await allHeroes.FirstOrDefaultAsync(b => b.Name == nameOfHero);
 
             if (newHero == null || user == null)
                 return false;
@@ -138,7 +140,21 @@ namespace JwtWebApi.Repositories
                 user.Heroes = new List<Hero>();
             }
 
-            _context.UsersHeroes.Add(newHero);
+            ///ליצור אובייקט חדש ואותו להכניס את הישן לא לשנות !
+            ///make new hero
+            ///
+            Hero newObj = new Hero()
+            {
+                Name = newHero.Name,
+                Ability= newHero.Ability,
+                TrainerName= userName,
+                FirstDayHeroTrained=0,
+                StartingPower=newHero.StartingPower,
+                CurrentPower=newHero.CurrentPower,
+                SuitColors=newHero.SuitColors,
+                LastTimeHeroTrained=newHero.LastTimeHeroTrained,
+            };
+            _context.AllHeroes.Add(newObj);
             await _context.SaveChangesAsync();
             return true;
         }
