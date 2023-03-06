@@ -51,57 +51,18 @@ namespace JwtWebApi.Repositories
             return heroes;
         }
 
-        /// <summary>
-        /// גיבורים של היוזר 
-        /// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="userName"></param>
-        ///// <returns></returns>
-        ///// <exception cref="ArgumentException"></exception>
-        public async Task<List<Hero>> GetHeroByIdAsync(int id, string userName)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
-            if (user == null)
-            {
-                throw new ArgumentException("User not found.");
-            }
-
-            var Heroes = user?.Heroes?.ToList();
-            if (Heroes == null)
-            {
-                throw new ArgumentException("Hero not found.");
-            }
-            return Heroes;
-        }
+       
         public async Task<List<Hero>> GetAllUserHeroes(string userName)
         {
             var heroes = _context.AllHeroes.Where(u => u.TrainerName == userName);
             return heroes.OrderByDescending(h => h.CurrentPower).ToList();
         }
 
-        /// <summary>
-        /// route my heroes 
+
         /// ברגע שאני עובר אוטנטיקציה אז הוא ידע מהטוקן את האיידי שלך 
         /// ואז לפי האיידי 
-        /// </summary>
-        /// <param /*name="name">*/</param>
-        //*// <param name="userName"></param>*/
-        /// <returns></returns>
-        //public async Task<List<Hero>> TrainHeroByIdAsync(string name, string userName)
-        //{
-        //    var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
 
-        //    var hero = user?.Heroes?.Where(b => b.Name == name);
-        //    Random random = new Random();
-        //    foreach (var Hero in hero)
-        //    {
-        //        double v = (1 + random.NextDouble() * 0.1);
-        //        Hero.CurrentPower = Hero.CurrentPower * v;
-        //        Console.WriteLine(Hero.CurrentPower);
 
-        //    }
-        //    return (List<Hero>)hero;
-        //}
         public async Task<bool> TrainHeroAsync(string name, string userName)
         {
             var heroes =  _context.AllHeroes.Where(u => u.TrainerName == userName);
@@ -139,9 +100,7 @@ namespace JwtWebApi.Repositories
             ///להוסיף שקר אם זה לא הצליח
             return true;
 
-
         }
-       
 
         public async Task<bool> AddHeroAsync(string nameOfHero, string userName)
         {
@@ -164,9 +123,7 @@ namespace JwtWebApi.Repositories
                 user.Heroes = new List<Hero>();
             }
 
-            ///ליצור אובייקט חדש ואותו להכניס את הישן לא לשנות !
             ///make new hero
-            ///
             Hero newObj = new Hero()
             {
                 Name = newHero.Name,

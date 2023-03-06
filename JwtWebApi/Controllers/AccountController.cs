@@ -17,20 +17,19 @@ using Microsoft.AspNetCore.Http;
 namespace JwtWebApi.Controllers
 {
     [ApiController]
-    
-    public class AutoController : ControllerBase
+
+    public class AccountController : ControllerBase
     {
         public static User user = new User();
         private readonly DataContext _context;
         private readonly IConfiguration _configuration;
-        public string currentUserName = "";
         private readonly IHeroesRepository _heroesRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
 
 
 
-        public AutoController(IHttpContextAccessor httpContextAccessor,IConfiguration configuration, DataContext context, IHeroesRepository heroesRepository)
+        public AccountController(IHttpContextAccessor httpContextAccessor,IConfiguration configuration, DataContext context, IHeroesRepository heroesRepository)
         {
             _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
@@ -73,18 +72,12 @@ namespace JwtWebApi.Controllers
             {
                 return BadRequest("Wrong Password");
             }
-            currentUserName = user.Username;
-            Console.WriteLine(currentUserName);
             string token = CreateToken(user);
-          
-
-
             dynamic flexible = new ExpandoObject();
             var dictionary = (IDictionary<string, Object>)flexible;
             dictionary.Add("access_token", token);
             dictionary.Add("token_expiry", DateTime.Now.AddDays(2));
             dictionary.Add("needTofixDate", false);
-          
             return Ok(dictionary);
         }
         private string CreateToken(User user)
@@ -129,13 +122,10 @@ namespace JwtWebApi.Controllers
 
 
 
-         [HttpGet("heroes")]
+        [HttpGet("users/user/heroes")]
          public async Task<IActionResult> getAllUserHeroes()
            {
-            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            var handler = new JwtSecurityTokenHandler();
-            var decodedToken = handler.ReadJwtToken(token);
-            var userId = decodedToken.Claims.ToArray()[0]?.Value;
+            var userId = getUserNameByToken();
             var res = await _heroesRepository.GetAllUserHeroes(userId);
 
             if (res?.Count > 0)
@@ -145,38 +135,17 @@ namespace JwtWebApi.Controllers
             return BadRequest("zeev is mniake");
 
           }
-        /// <summary>
+
         /// //from headers bearer and token without auto postmen only key= Authorization
         /// /// value exaple= Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6ImEiLCJleHAiOjE2NzgxOTY0MjN9.gNDgXckCC1u510ZVmR53YAKgRn5LeISD1BjxJDMoZ2dSpz3a2LKaXnbNJPWtK2nnyGYMAZKak1CspzMorjtYTg
-        /// </summary>
-        /// <param</param>
-        /// <returns></returns>
-        [HttpGet("{heroId}")]
-            public async Task<IActionResult> GetHeroById(int heroId)
-            {
-            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            var handler = new JwtSecurityTokenHandler();
-            var decodedToken = handler.ReadJwtToken(token);
-            var userId = decodedToken.Claims.ToArray()[0]?.Value;
-      
-            
-            var res = await _heroesRepository.GetHeroByIdAsync(heroId, userId);
-                if (res != null)
-                {
-                    return Ok(res);
-                }
-                return NotFound();
 
-            }
-            [HttpPatch("{heroName}")]
+     
+
+        [HttpPatch("users/user/heroes/{heroName}")]
             ///istrainHeroPossible
             public async Task<IActionResult> TrainHero(string heroName)
             {
-            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            var handler = new JwtSecurityTokenHandler();
-            var decodedToken = handler.ReadJwtToken(token);
-            var userId = decodedToken.Claims.ToArray()[0]?.Value;
-       
+            var userId = getUserNameByToken();
             var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName, userId);
                     if (isValidTrain)
                     return Ok("hero trained");
@@ -185,31 +154,27 @@ namespace JwtWebApi.Controllers
                 return BadRequest("hero not trained");
             }
 
-
-        [HttpGet("/me")]
-        public async Task<IActionResult> GetCurrentUser()
-        {
-            return Ok(User?.FindFirst(ClaimTypes.Name)?.Value);
-        }
-
-        [HttpPost("/{nameOfHero}")]
+        [HttpPost("users/user/heroes/{nameOfHero}")]
         public async Task<IActionResult> isPossibleAddNewHero(string nameOfHero)
         {
-            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            var handler = new JwtSecurityTokenHandler();
-            var decodedToken = handler.ReadJwtToken(token);
-            var userId = decodedToken.Claims.ToArray()[0]?.Value;
-
-
+           var userId = getUserNameByToken();
            var isHeroAdded = await _heroesRepository.AddHeroAsync(nameOfHero, userId);
             if (isHeroAdded)
                 return Ok("hero added");
             else
                 return BadRequest("hero already exicted");
-
         }
 
-
+        [HttpGet("/me")]
+        public string? getUserNameByToken(){
+            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (token == "")
+                return "you dont have token send";
+            
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+            return decodedToken?.Claims?.ToArray()[0]?.Value;
+        }
 
     }
 }
