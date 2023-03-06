@@ -150,7 +150,7 @@ namespace JwtWebApi.Controllers
 
             }
             [HttpPatch("{heroName}")]
-
+            ///istrainHeroPossible
             public async Task<IActionResult> TrainHero(string heroName)
             {
             var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
@@ -160,10 +160,10 @@ namespace JwtWebApi.Controllers
        
             var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName, userId);
                     if (isValidTrain)
-                    return Ok();
+                    return Ok("hero trained");
 
 
-                return NotFound();
+                return BadRequest("hero not trained");
             }
 
 

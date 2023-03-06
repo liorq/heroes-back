@@ -14,6 +14,8 @@
         public string? SuitColors { get; set; }
 
         public string? LastTimeHeroTrained { get; set; }
+        public int? AmountOfTimeHeroTrained { get; set; }
+
 
     }
 }

@@ -82,42 +82,61 @@ namespace JwtWebApi.Repositories
         /// <param /*name="name">*/</param>
         //*// <param name="userName"></param>*/
         /// <returns></returns>
-        public async Task<List<Hero>> TrainHeroByIdAsync(string name, string userName)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
+        //public async Task<List<Hero>> TrainHeroByIdAsync(string name, string userName)
+        //{
+        //    var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
 
-            var hero = user?.Heroes?.Where(b => b.Name == name);
-            Random random = new Random();
-            foreach (var Hero in hero)
-            {
-                double v = (1 + random.NextDouble() * 0.1);
-                Hero.CurrentPower = Hero.CurrentPower * v;
-                Console.WriteLine(Hero.CurrentPower);
+        //    var hero = user?.Heroes?.Where(b => b.Name == name);
+        //    Random random = new Random();
+        //    foreach (var Hero in hero)
+        //    {
+        //        double v = (1 + random.NextDouble() * 0.1);
+        //        Hero.CurrentPower = Hero.CurrentPower * v;
+        //        Console.WriteLine(Hero.CurrentPower);
 
-            }
-            return (List<Hero>)hero;
-        }
+        //    }
+        //    return (List<Hero>)hero;
+        //}
         public async Task<bool> TrainHeroAsync(string name, string userName)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
+            var heroes =  _context.AllHeroes.Where(u => u.TrainerName == userName);
+            var hero = heroes.FirstOrDefault(u => u.Name == name);
 
-            var heroes = user?.Heroes?.Where(b => b.Name == name);
-            if (heroes == null)
+            if (heroes == null|| hero==null)
                 return false;
 
+            string formattedDate = DateTime.Today.ToString("yyyy-MM-dd");
+
+
             Random random = new Random();
-            foreach (var hero in heroes)
+            if (hero.AmountOfTimeHeroTrained == 5 && hero.LastTimeHeroTrained == formattedDate)
+                return false;
+            if (hero.LastTimeHeroTrained != formattedDate)
             {
+                hero.AmountOfTimeHeroTrained = 0;
+                hero.LastTimeHeroTrained = formattedDate;
+
+            }
+            
+                if (hero.AmountOfTimeHeroTrained == null)
+                    hero.AmountOfTimeHeroTrained = 0;
+
                 double v = (1 + random.NextDouble() * 0.1);
                 hero.CurrentPower = hero.CurrentPower * v;
                 Console.WriteLine(hero.CurrentPower);
-            }
+                hero.LastTimeHeroTrained = formattedDate;
+                hero.AmountOfTimeHeroTrained++;
+            
+
+            ///להוסיף שדה של היום ראשון שהתאמנתי ושדה של הפעם האחרונה שהתאמנתי וכמות הפעמים שהתאמנתי באותו יום 
+            
             await _context.SaveChangesAsync();
             ///להוסיף שקר אם זה לא הצליח
             return true;
 
 
         }
+       
 
         public async Task<bool> AddHeroAsync(string nameOfHero, string userName)
         {
