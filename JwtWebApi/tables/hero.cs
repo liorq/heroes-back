@@ -4,6 +4,8 @@
     {
         public string? Name { get; set; }
         public string? Ability { get; set; }
+        public string? TrainerName { get; set; }
+
         public int? Id { get; set; }
         public int? FirstDayHeroTrained { get; set; }
         public double? StartingPower { get; set; }

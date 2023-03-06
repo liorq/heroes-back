@@ -46,7 +46,10 @@ namespace JwtWebApi.Controllers
             {
                 Username = username,
                 Password = password,
-                Role = role
+                Role = role,
+                Heroes = new List<Hero>(),
+
+                ////להוסיף מזהה 
             };
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -170,7 +173,7 @@ namespace JwtWebApi.Controllers
             return Ok(User?.FindFirst(ClaimTypes.Name)?.Value);
         }
 
-        [HttpPost("/nameOfHero")]
+        [HttpPost("/{nameOfHero}")]
         public async Task<IActionResult> isPossibleAddNewHero(string nameOfHero)
         {
             var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");

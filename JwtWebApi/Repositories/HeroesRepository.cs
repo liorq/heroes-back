@@ -27,7 +27,7 @@ namespace JwtWebApi.Repositories
 
             foreach (var hero in heroes)
             {
-                _context.Heroes.Add(hero);
+                _context.AllHeroes.Add(hero);
                 Console.WriteLine(hero.Name);
             }
             await _context.SaveChangesAsync(); // persist changes to the database
@@ -39,7 +39,7 @@ namespace JwtWebApi.Repositories
         {
             ///intiti framework
             ///כל מה שמתשנה בקונטקסט משתנה גם בפיירמוורק
-            var heroes = await _context.Heroes.ToListAsync();
+            var heroes = await _context.AllHeroes.ToListAsync();
             if (heroes.Count == 0)
                 await SetAllHeroesAsync();
 
@@ -50,6 +50,13 @@ namespace JwtWebApi.Repositories
             return heroes;
         }
 
+        /// <summary>
+        /// גיבורים של היוזר 
+        /// </summary>
+        ///// <param name="id"></param>
+        ///// <param name="userName"></param>
+        ///// <returns></returns>
+        ///// <exception cref="ArgumentException"></exception>
         public async Task<List<Hero>> GetHeroByIdAsync(int id, string userName)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
@@ -58,12 +65,12 @@ namespace JwtWebApi.Repositories
                 throw new ArgumentException("User not found.");
             }
 
-            var hero = user?.Heroes?.ToList();
-            if (hero == null)
+            var Heroes = user?.Heroes?.ToList();
+            if (Heroes == null)
             {
                 throw new ArgumentException("Hero not found.");
             }
-            return hero;
+            return Heroes;
         }
 
         /// <summary>
@@ -114,22 +121,25 @@ namespace JwtWebApi.Repositories
         public async Task<bool> AddHeroAsync(string nameOfHero, string userName)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
-            var heroes = user?.Heroes?.Where(b => b.Name == userName);
-            var newHeroes = await _context.Heroes.FirstOrDefaultAsync(b => b.Name == userName);
+            var heroes = await _context.UsersHeroes.FirstOrDefaultAsync(b => b.TrainerName == userName);
 
+            var newHero = await _context.AllHeroes.FirstOrDefaultAsync(b => b.Name == nameOfHero);
 
-            foreach (var hero in heroes)
-            {
-                if (hero.Name == nameOfHero)
-                {
-                    return false;
-                }
-
-
-            }
-            if (newHeroes == null)
+            if (newHero == null || user == null)
                 return false;
-            user?.Heroes?.Add(newHeroes);
+
+            if (heroes != null && heroes.Name == nameOfHero)
+            {
+                return false;
+            }
+
+            if (user?.Heroes == null)
+            {
+                user.Heroes = new List<Hero>();
+            }
+
+            _context.UsersHeroes.Add(newHero);
+            await _context.SaveChangesAsync();
             return true;
         }
     }

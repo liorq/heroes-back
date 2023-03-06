@@ -11,7 +11,8 @@ namespace JwtWebApi.data
         public DbSet<Messages> Messages { get; set; }
         public DbSet<Missions> Missions { get; set; }
         public DbSet<Rooms> Rooms { get; set; }
-        public DbSet<Hero> Heroes { get; set; }
+        public DbSet<Hero> UsersHeroes { get; set; }
+        public DbSet<Hero> AllHeroes { get; set; }
 
     }
 }
