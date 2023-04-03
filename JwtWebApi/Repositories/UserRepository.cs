@@ -35,7 +35,7 @@ namespace JwtWebApi.Repositories
 
         public async Task<User> GetUser(string username)
         {
-            return await _context.Users.SingleOrDefaultAsync(user => user.Username == username);
+            return  await _context.Users.SingleOrDefaultAsync(user => user.Username == username);
         }
     }
 }

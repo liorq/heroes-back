@@ -44,11 +44,12 @@ namespace JwtWebApi.Controllers
         {
 
             var existingUser = await _context.Users.FirstOrDefaultAsync(user => user.Username == username);
+            Console.WriteLine(existingUser);
             if (existingUser != null)
               return BadRequest("Username already exists");
             else
             {
-             await _userRepository.CreateUser(username, password,role);
+            await _userRepository.CreateUser(username, password,role);
             return Ok("UserCreatedSuccessfully");
             }
 
@@ -62,7 +63,7 @@ namespace JwtWebApi.Controllers
         public record class ReqData(string username, string password);
 
         [HttpPost("/login")]
-        public async Task<ActionResult<string>> Login([FromForm] ReqData reqData)
+        public async Task<ActionResult<string>> Login([FromBody] ReqData reqData)
         {
             /////no use first
             ///var user=
