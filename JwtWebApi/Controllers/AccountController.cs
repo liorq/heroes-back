@@ -25,60 +25,70 @@ namespace JwtWebApi.Controllers
         private readonly IConfiguration _configuration;
         private readonly IHeroesRepository _heroesRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUserRepository _userRepository;
 
 
 
 
-        public AccountController(IHttpContextAccessor httpContextAccessor,IConfiguration configuration, DataContext context, IHeroesRepository heroesRepository)
+        public AccountController(IHttpContextAccessor httpContextAccessor,IConfiguration configuration, DataContext context, IHeroesRepository heroesRepository, IUserRepository userRepository)
         {
             _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
             _context = context;
             _heroesRepository = heroesRepository;
-
+            _userRepository = userRepository;
         }
 
         [HttpPost("/signUp")]
-        public async Task<User> CreateUser(string username, string password, string role)
+        public async Task<IActionResult> CreateUser(string username, string password, string role)
         {
-            var user = new User
-            {
-                Username = username,
-                Password = password,
-                Role = role,
-                Heroes = new List<Hero>(),
 
-            };
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-            return user;
+            var existingUser = await _context.Users.FirstOrDefaultAsync(user => user.Username == username);
+            if (existingUser != null)
+              return BadRequest("Username already exists");
+            else
+            {
+             await _userRepository.CreateUser(username, password,role);
+            return Ok("UserCreatedSuccessfully");
+            }
+
+            
         }
+
+
+
+
+
         public record class ReqData(string username, string password);
 
         [HttpPost("/login")]
         public async Task<ActionResult<string>> Login([FromForm] ReqData reqData)
         {
-            User user = await _context.Users.SingleAsync((user) => user.Username == reqData.username);
-            if (user == null)
-            {
+            /////no use first
+            ///var user=
+            var user = await _userRepository.GetUser(reqData.username);
+            //User user = await _context.Users.SingleAsync((user) => user.Username == reqData.username);
+            if (user == null|| user.Username != reqData.username)
                 return BadRequest("User Not Found");
-            }
-            if (user.Username != reqData.username)
-            {
-                return BadRequest("User Not Found");
-            }
+
             if (user.Password != reqData.password)
-            {
                 return BadRequest("Wrong Password");
-            }
+
+
+            ////loginHandler
+
             string token = CreateToken(user);
             dynamic flexible = new ExpandoObject();
             var dictionary = (IDictionary<string, Object>)flexible;
             dictionary.Add("access_token", token);
             dictionary.Add("token_expiry", DateTime.Now.AddDays(2));
             dictionary.Add("needTofixDate", false);
+
             return Ok(dictionary);
         }
+
+
+
         private string CreateToken(User user)
         {
             List<Claim> claims = new List<Claim>();
@@ -106,74 +116,7 @@ namespace JwtWebApi.Controllers
 
 
 
-            [HttpGet("")]
-            public async Task<IActionResult> getAllHeroes(){
 
-            var res = await _heroesRepository.GetAllHeroesAsync();
-
-            if (res?.Count > 0)
-                {
-                    return Ok(res);
-                }
-                return BadRequest("zeev is mniake");
-
-            }
-
-
-
-        [HttpGet("users/{user}/heroes")]
-         public async Task<IActionResult> getAllUserHeroes()
-           {
-            var userId = getUserNameByToken();
-            var res = await _heroesRepository.GetAllUserHeroes(userId);
-
-            if (res?.Count > 0)
-            {
-                return Ok(res);
-            }
-            return BadRequest("zeev is mniake");
-
-          }
-
-        /// //from headers bearer and token without auto postmen only key= Authorization
-        /// /// value exaple= Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6ImEiLCJleHAiOjE2NzgxOTY0MjN9.gNDgXckCC1u510ZVmR53YAKgRn5LeISD1BjxJDMoZ2dSpz3a2LKaXnbNJPWtK2nnyGYMAZKak1CspzMorjtYTg
-
-     
-
-        [HttpPatch("users/{user}/heroes/{heroName}")]
-            ///istrainHeroPossible
-            public async Task<IActionResult> TrainHero(string heroName)
-            {
-            var userId = getUserNameByToken();
-            var isValidTrain = await _heroesRepository.TrainHeroAsync(heroName, userId);
-                    if (isValidTrain)
-                    return Ok("hero trained");
-
-
-                return BadRequest("hero not trained");
-            }
-
-        [HttpPost("users/{user}/heroes/{nameOfHero}")]
-        public async Task<IActionResult> isPossibleAddNewHero(string nameOfHero)
-        {
-           var userId = getUserNameByToken();
-           var isHeroAdded = await _heroesRepository.AddHeroAsync(nameOfHero, userId);
-            if (isHeroAdded)
-                return Ok("hero added");
-            else
-                return BadRequest("hero already exicted");
-        }
-
-        [HttpGet("/me")]
-        public string? getUserNameByToken(){
-            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            if (token == "")
-                return "you dont have token send";
-            
-            var handler = new JwtSecurityTokenHandler();
-            var decodedToken = handler.ReadJwtToken(token);
-            return decodedToken?.Claims?.ToArray()[0]?.Value;
-        }
 
     }
 }

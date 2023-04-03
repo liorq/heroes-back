@@ -50,6 +50,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
             ValidateAudience = false
         };
     });
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<IHeroesRepository, HeroesRepository>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
