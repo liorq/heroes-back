@@ -23,7 +23,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("http://localhost:7001","http://127.0.0.1:7001");
+                          policy.WithOrigins("http://localhost:4200","http://127.0.0.1:4200");
                       });
 });
 builder.Services.AddSwaggerGen(options =>
@@ -74,6 +74,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
+app.UseCors(MyAllowSpecificOrigins);
 
 app.MapControllers();
 

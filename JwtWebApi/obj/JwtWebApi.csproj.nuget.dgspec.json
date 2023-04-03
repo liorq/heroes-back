@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\moshe\\Source\\Repos\\heroes-backend5\\JwtWebApi\\JwtWebApi.csproj": {}
+    "C:\\Users\\moshe\\Source\\Repos\\heroes-backend10\\JwtWebApi\\JwtWebApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\moshe\\Source\\Repos\\heroes-backend5\\JwtWebApi\\JwtWebApi.csproj": {
+    "C:\\Users\\moshe\\Source\\Repos\\heroes-backend10\\JwtWebApi\\JwtWebApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\moshe\\Source\\Repos\\heroes-backend5\\JwtWebApi\\JwtWebApi.csproj",
+        "projectUniqueName": "C:\\Users\\moshe\\Source\\Repos\\heroes-backend10\\JwtWebApi\\JwtWebApi.csproj",
         "projectName": "JwtWebApi",
-        "projectPath": "C:\\Users\\moshe\\Source\\Repos\\heroes-backend5\\JwtWebApi\\JwtWebApi.csproj",
+        "projectPath": "C:\\Users\\moshe\\Source\\Repos\\heroes-backend10\\JwtWebApi\\JwtWebApi.csproj",
         "packagesPath": "C:\\Users\\moshe\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\moshe\\Source\\Repos\\heroes-backend5\\JwtWebApi\\obj\\",
+        "outputPath": "C:\\Users\\moshe\\Source\\Repos\\heroes-backend10\\JwtWebApi\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
