@@ -13,6 +13,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Xml;
 using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 namespace JwtWebApi.Controllers
 {
@@ -40,24 +41,29 @@ namespace JwtWebApi.Controllers
         }
 
         [HttpPost("/signUp")]
-        public async Task<IActionResult> CreateUser(string username, string password, string role)
+        public async Task<IActionResult> CreateUser([FromBody] JsonElement requestBody)
         {
+            if (!requestBody.TryGetProperty("username", out JsonElement usernameElement) ||
+                !requestBody.TryGetProperty("password", out JsonElement passwordElement) ||
+                !requestBody.TryGetProperty("role", out JsonElement roleElement))
+            {
+                return BadRequest("Invalid request body");
+            }
+
+            string username = usernameElement.GetString();
+            string password = passwordElement.GetString();
+            string role = roleElement.GetString();
 
             var existingUser = await _context.Users.FirstOrDefaultAsync(user => user.Username == username);
             Console.WriteLine(existingUser);
             if (existingUser != null)
-              return BadRequest("Username already exists");
+                return BadRequest("Username already exists");
             else
             {
-            await _userRepository.CreateUser(username, password,role);
-            return Ok("UserCreatedSuccessfully");
+                await _userRepository.CreateUser(username, password, role);
+                return Ok("UserCreatedSuccessfully");
             }
-
-            
         }
-
-
-
 
 
         public record class ReqData(string username, string password);
@@ -65,10 +71,8 @@ namespace JwtWebApi.Controllers
         [HttpPost("/login")]
         public async Task<ActionResult<string>> Login([FromBody] ReqData reqData)
         {
-            /////no use first
-            ///var user=
+          
             var user = await _userRepository.GetUser(reqData.username);
-            //User user = await _context.Users.SingleAsync((user) => user.Username == reqData.username);
             if (user == null|| user.Username != reqData.username)
                 return BadRequest("User Not Found");
 
@@ -76,9 +80,7 @@ namespace JwtWebApi.Controllers
                 return BadRequest("Wrong Password");
 
 
-            ////loginHandler
-
-            string token = CreateToken(user);
+            string token =  _userRepository.CreateToken(user);
             dynamic flexible = new ExpandoObject();
             var dictionary = (IDictionary<string, Object>)flexible;
             dictionary.Add("access_token", token);
@@ -87,37 +89,6 @@ namespace JwtWebApi.Controllers
 
             return Ok(dictionary);
         }
-
-
-
-        private string CreateToken(User user)
-        {
-            List<Claim> claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Name, user.Username));
-            claims.Add(new Claim(ClaimTypes.Role, user.Role));
-
-            if (user.Role == "ROLE_OWNER")
-            {
-                claims.Add(new Claim(ClaimTypes.Role, "ROLE_MANAGER"));
-            }
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(2),
-                signingCredentials: creds
-                );
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-            return jwt;
-        }
-
-      
-
-
-
-
-
 
     }
 }

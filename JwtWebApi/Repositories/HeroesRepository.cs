@@ -1,7 +1,9 @@
 ﻿using JwtWebApi.data;
 using JwtWebApi.tables;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NHibernate.Util;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -10,40 +12,35 @@ namespace JwtWebApi.Repositories
     public class HeroesRepository : IHeroesRepository
     {
         private readonly DataContext _context;
-        public HeroesRepository(DataContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public HeroesRepository(DataContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
-        }
-
-
-        public async Task<List<Hero>> SetAllHeroesAsync()
-        {
-            List<Hero> heroes = new List<Hero> {
-        new Hero { Name = "Superman", Ability = "Super strength, flight, invulnerability", Id = null, FirstDayHeroTrained = 1978, StartingPower = 100, CurrentPower = 95, SuitColors = "Red, blue, yellow", LastTimeHeroTrained = "Yesterday" ,TrainerName="manger"},
-        new Hero { Name = "Batman", Ability = "Peak physical and mental conditioning, martial arts, detective skills", Id = null, FirstDayHeroTrained = 1939, StartingPower = 80, CurrentPower = 70, SuitColors = "Black, gray", LastTimeHeroTrained = "Last week",TrainerName="manger" },
-        new Hero { Name = "Wonder Woman", Ability = "Super strength, flight, invulnerability, Lasso of Truth", Id = null, FirstDayHeroTrained = 1941, StartingPower = 90, CurrentPower = 85, SuitColors = "Red, blue, gold", LastTimeHeroTrained = "Yesterday",TrainerName="manger" },
-        new Hero { Name = "Spider-Man", Ability = "Super strength, agility, spider-sense, web-slinging", Id = null, FirstDayHeroTrained = 1962, StartingPower = 70, CurrentPower = 60, SuitColors = "Red, blue", LastTimeHeroTrained = "Last week" ,TrainerName="manger"},
-        new Hero { Name = "Iron Man", Ability = "Powered suit with weapons and flight capabilities", Id = null, FirstDayHeroTrained = 1963, StartingPower = 85, CurrentPower = 80, SuitColors = "Red, gold", LastTimeHeroTrained = "Yesterday" ,TrainerName="manger"}
-    };
-
-            foreach (var hero in heroes)
-            {
-                _context.AllHeroes.Add(hero);
-                Console.WriteLine(hero.Name);
-            }
-            await _context.SaveChangesAsync(); // persist changes to the database
-
-            return heroes;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<List<Hero>> GetAllHeroesAsync()
         {
-            ///intiti framework
-            ///כל מה שמתשנה בקונטקסט משתנה גם בפיירמוורק
-            var heroes = await _context.AllHeroes.ToListAsync();
-            if (heroes.Count == 0)
-                await SetAllHeroesAsync();
+    
 
+              List<Hero> heroes = new List<Hero> {
+       new Hero("spiderman", "attacker", 0, "red", 25, 25, null, 0,"boss"),
+    new Hero("ironMan", "attacker", 0, "red and gold", 30, 30, null, 0,"boss"),
+    new Hero("batman", "attacker", 0, "black", 25, 25, null, 0,"boss"),
+    new Hero("captain_America", "defender", 0, "red", 14, 14, null, 0,"boss"),
+    new Hero("dark_knight", "attacker",  0, "black", 36, 36, null, 0,"boss"),
+    new Hero("flash", "defender", 0, "red and yellow", 28, 28, null, 0,"boss"),
+    new Hero("super_man", "defender", 0, "blue and red", 59, 59, null, 0,"boss"),
+    new Hero("joker", "attacker", 0, "purple", 500, 500, null, 0,"boss"),
+    new Hero("wanda", "attacker",  0, "red", 5858, 5858, null, 0,"boss"),
+    new Hero("black_widow", "defender", 0, "black", 855, 855, null, 0,"boss"),
+    new Hero("ant_man", "attacker", 0,  "black and red", 858, 858, null, 0,"boss"),
+    new Hero("doctor_strange", "defender", 0, "blue and red", 58, 58, null, 0,"boss"),
+    new Hero("spiderman_improved", "defender", 0, "yellow and red", 252, 252, null, 0,"boss"),
+    new Hero("thor", "attacker", 0, "red and gold", 100, 100, null, 0,"boss")
+};
+            
             foreach (var hero in heroes)
             {
                 Console.WriteLine(hero.Id);
@@ -54,19 +51,17 @@ namespace JwtWebApi.Repositories
        
         public async Task<List<Hero>> GetAllUserHeroes(string userName)
         {
+
             var heroes = _context.AllHeroes.Where(u => u.TrainerName == userName);
             return heroes.OrderByDescending(h => h.CurrentPower).ToList();
         }
-
-
-        /// ברגע שאני עובר אוטנטיקציה אז הוא ידע מהטוקן את האיידי שלך 
-        /// ואז לפי האיידי 
 
 
         public async Task<bool> TrainHeroAsync(string name, string userName)
         {
             var heroes =  _context.AllHeroes.Where(u => u.TrainerName == userName);
             var hero = heroes.FirstOrDefault(u => u.Name == name);
+
 
             if (heroes == null|| hero==null)
                 return false;
@@ -89,7 +84,7 @@ namespace JwtWebApi.Repositories
 
                 double v = (1 + random.NextDouble() * 0.1);
                 hero.CurrentPower = hero.CurrentPower * v;
-                Console.WriteLine(hero.CurrentPower);
+                
                 hero.LastTimeHeroTrained = formattedDate;
                 hero.AmountOfTimeHeroTrained++;
             
@@ -106,8 +101,10 @@ namespace JwtWebApi.Repositories
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userName);
             var heroes = await _context.AllHeroes.FirstOrDefaultAsync(b => b.TrainerName == userName);
 
-            var allHeroes = _context.AllHeroes.Where(h=>h.TrainerName=="manger");
-            var newHero = await allHeroes.FirstOrDefaultAsync(b => b.Name == nameOfHero);
+            IEnumerable<Hero> allHeroes = await GetAllHeroesAsync();
+            var newHero =  allHeroes?.FirstOrDefault(b => b.Name == nameOfHero);
+
+    
 
             if (newHero == null || user == null)
                 return false;
@@ -122,21 +119,36 @@ namespace JwtWebApi.Repositories
                 user.Heroes = new List<Hero>();
             }
 
-            ///make new hero
+
+            Random random = new Random();
+       
+          ////id
             Hero newObj = new Hero()
             {
                 Name = newHero.Name,
-                Ability= newHero.Ability,
-                TrainerName= userName,
-                FirstDayHeroTrained=0,
-                StartingPower=newHero.StartingPower,
-                CurrentPower=newHero.CurrentPower,
-                SuitColors=newHero.SuitColors,
-                LastTimeHeroTrained=newHero.LastTimeHeroTrained,
+                Ability = newHero.Ability,
+                TrainerName = userName,
+                FirstDayHeroTrained = 0,
+                StartingPower = newHero.StartingPower,
+                CurrentPower = newHero.CurrentPower,
+                SuitColors = newHero.SuitColors,
+                LastTimeHeroTrained = newHero.LastTimeHeroTrained, 
+                AmountOfTimeHeroTrained = 0
             };
             _context.AllHeroes.Add(newObj);
             await _context.SaveChangesAsync();
             return true;
         }
+        public string? getUserNameByToken()
+        {
+            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (token == "")
+                return "you dont have token send";
+
+            var handler = new JwtSecurityTokenHandler();
+            var decodedToken = handler.ReadJwtToken(token);
+            return decodedToken?.Claims?.ToArray()[0]?.Value;
+        }
     }
+
 }
