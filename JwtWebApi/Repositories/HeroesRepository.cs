@@ -22,25 +22,26 @@ namespace JwtWebApi.Repositories
 
         public async Task<List<Hero>> GetAllHeroesAsync()
         {
-    
 
-              List<Hero> heroes = new List<Hero> {
+
+            List<Hero> heroes = new List<Hero> {
+       new Hero("joker", "attacker", 0, "purple", 500, 500, null, 0,"boss"),
+       new Hero("black_widow", "defender", 0, "black", 400, 400, null, 0,"boss"),
+       new Hero("wanda", "attacker",  0, "red", 300, 300, null, 0,"boss"),
+       new Hero("ant_man", "attacker", 0,  "black and red", 200, 200, null, 0,"boss"),
+       new Hero("spiderman_improved", "defender", 0, "yellow and red", 252, 252, null, 0,"boss"),
+       new Hero("thor", "attacker", 0, "red and gold", 100, 100, null, 0,"boss"),
+       new Hero("super_man", "defender", 0, "blue and red", 59, 59, null, 0,"boss"),
+       new Hero("doctor_strange", "defender", 0, "blue and red", 58, 58, null, 0,"boss"),
+       new Hero("ironMan", "attacker", 0, "red and gold", 30, 30, null, 0,"boss"),
+       new Hero("flash", "defender", 0, "red and yellow", 28, 28, null, 0,"boss"),
+       new Hero("dark_knight", "attacker",  0, "black", 36, 36, null, 0,"boss"),
        new Hero("spiderman", "attacker", 0, "red", 25, 25, null, 0,"boss"),
-    new Hero("ironMan", "attacker", 0, "red and gold", 30, 30, null, 0,"boss"),
-    new Hero("batman", "attacker", 0, "black", 25, 25, null, 0,"boss"),
-    new Hero("captain_America", "defender", 0, "red", 14, 14, null, 0,"boss"),
-    new Hero("dark_knight", "attacker",  0, "black", 36, 36, null, 0,"boss"),
-    new Hero("flash", "defender", 0, "red and yellow", 28, 28, null, 0,"boss"),
-    new Hero("super_man", "defender", 0, "blue and red", 59, 59, null, 0,"boss"),
-    new Hero("joker", "attacker", 0, "purple", 500, 500, null, 0,"boss"),
-    new Hero("wanda", "attacker",  0, "red", 5858, 5858, null, 0,"boss"),
-    new Hero("black_widow", "defender", 0, "black", 855, 855, null, 0,"boss"),
-    new Hero("ant_man", "attacker", 0,  "black and red", 858, 858, null, 0,"boss"),
-    new Hero("doctor_strange", "defender", 0, "blue and red", 58, 58, null, 0,"boss"),
-    new Hero("spiderman_improved", "defender", 0, "yellow and red", 252, 252, null, 0,"boss"),
-    new Hero("thor", "attacker", 0, "red and gold", 100, 100, null, 0,"boss")
+       new Hero("batman", "attacker", 0, "black", 25, 25, null, 0,"boss"),
+       new Hero("captain_America", "defender", 0, "red", 14, 14, null, 0,"boss")
 };
-            
+
+
             foreach (var hero in heroes)
             {
                 Console.WriteLine(hero.Id);
@@ -81,11 +82,11 @@ namespace JwtWebApi.Repositories
             
                 if (hero.AmountOfTimeHeroTrained == null)
                     hero.AmountOfTimeHeroTrained = 0;
+            double powerIncrease = (DateTime.Now.Minute % 10 + 1) / 100.0;
+            hero.CurrentPower = (int)(hero.CurrentPower * (1 + powerIncrease));
 
-                double v = (1 + random.NextDouble() * 0.1);
-                hero.CurrentPower = hero.CurrentPower * v;
-                
-                hero.LastTimeHeroTrained = formattedDate;
+
+            hero.LastTimeHeroTrained = formattedDate;
                 hero.AmountOfTimeHeroTrained++;
             
 
