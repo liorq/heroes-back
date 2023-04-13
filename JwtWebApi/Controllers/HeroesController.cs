@@ -54,6 +54,22 @@ namespace JwtWebApi.Controllers
         }
 
 
+          [HttpGet("users/heroes")]
+        public async Task<IActionResult> GetAllUsersHeroes()
+        {
+            var userId =  _heroesRepository.getUserNameByToken();
+            if (userId != null){
+              var res = await _heroesRepository.GetAllUsersHeroes();
+
+                if (res != null&& userId!=null)
+                return Ok(res);
+            }
+          
+            return BadRequest("");
+
+        }
+
+
 
         [HttpGet("users/{user}/heroes")]
         public async Task<IActionResult> getAllUserHeroes()
@@ -74,7 +90,7 @@ namespace JwtWebApi.Controllers
 
 
         [HttpPatch("users/{user}/heroes/{heroName}")]
-        ///istrainHeroPossible
+
         public async Task<IActionResult> TrainHero(string heroName)
         {
             var userId =  _heroesRepository.getUserNameByToken();

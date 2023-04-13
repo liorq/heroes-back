@@ -13,7 +13,7 @@ namespace JwtWebApi.Repositories
         Task<List<Hero>> GetAllUserHeroes(string userName);
         public string? getUserNameByToken();
 
-
+         Task<List<Hero>> GetAllUsersHeroes();
 
     }
 }

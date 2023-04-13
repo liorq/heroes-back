@@ -57,6 +57,12 @@ namespace JwtWebApi.Repositories
             return heroes.OrderByDescending(h => h.CurrentPower).ToList();
         }
 
+        public async Task<List<Hero>> GetAllUsersHeroes()
+        {
+            var heroes = await _context.AllHeroes.ToListAsync();
+            return heroes.OrderByDescending(h => h.CurrentPower).ToList();
+        }
+
 
         public async Task<bool> TrainHeroAsync(string name, string userName)
         {
